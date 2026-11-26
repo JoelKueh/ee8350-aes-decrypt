@@ -1,3 +1,4 @@
+% Common module 
 
 function output = gf_inv(input)
 	% Multiplicative 8-bit inverse in the Galois field
