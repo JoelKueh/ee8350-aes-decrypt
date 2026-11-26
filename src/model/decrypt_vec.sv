@@ -1,0 +1,1 @@
+../../refs/hvl-reference/rtl_sim/src/decrypt_vec.sv

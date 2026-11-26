@@ -1,35 +1,47 @@
-function RoundKeys = KeyExpand(K)
+function RoundKeys = KeyExpand(K, NumRounds) %#codegen
 	% AES Key Expansion transformation
-	% Input:  4x4 Key State Matrix
-	% Output: Array of round keys
+	% Input:  4x4 (128-bit), 4x6 (192-bit), or 4x8 (256-bit) uint8 Key State Matrix
+	% Output: 4x4x(NumRounds+1) Array of round keys
 
-	% Create initial array of round keys
-	RoundKeys = zeros(4, 4, 11, 'uint8');
-	RoundKeys(:,:,1) = K;
+	coder.inline('never');
+	assert(NumRounds == 10 || NumRounds == 12 || NumRounds == 14);
 
-	% Array of Round Constants XOR'd into the first column
+	% Compute the number of columns from the number of rounds
+	NumCols = NumRounds - 7;
+	NumWords = 4 * NumRounds;
+
+	% Create initial array of words
+	Words = zeros(4, NumWords, 'uint8');
+	Words(:, 1:NumCols) = K;
+
+	% Initial round constant
 	rcon = uint8(1);
 
-	% Compute the round Keys
-	for r = 2:11
-		% Compute the new first column
-		temp = RoundKeys(:, 4, r-1);
-		temp = circshift(temp, -1);
-		temp = SubWord(temp);
-		temp(1) = bitxor(temp(1), rcon)
-		RoundKeys(:, 1, r) = bitxor(RoundKeys(:, 1, r-1), temp);
+	% Compute each column of the word array
+	for i = (NumCols+1):NumWords
+		% Each column is XOR'd with the column before it
+		temp = Words(:, i-1);
 
-		% XOR the new firs column into the other columns
-		RoundKeys(:, 2, r) = bitxor(RoundKeys(:, 2, r-1), RoundKeys(:, 1, r));
-		RoundKeys(:, 3, r) = bitxor(RoundKeys(:, 3, r-1), RoundKeys(:, 2, r));
-		RoundKeys(:, 4, r) = bitxor(RoundKeys(:, 4, r-1), RoundKeys(:, 3, r));
-		
-		% Increment the round constant by multiplying by 2 in the Galois Field
-		rcon = GfMul(rcon, uint8(2));
+		if mod(i-1, NumCols) == 0
+			% Perform special compuation on the first column in every key
+			temp = circshift(temp, -1);
+			temp = SubWord(temp);
+			temp(1) = bitxor(temp(1), rcon);
+			rcon = GfMul(rcon, uint8(2));
+		elseif NumCols == 8 && mod(i-1, NumCols) == 4
+			% Perform extra SubWord halfway through 256-bit keys
+			temp = SubWord(temp);
+		end
+
+		% Update the new word based on the previous word and temp
+		Words(:, i) = bitxor(Words(:, i-NumCols), temp);
 	end
+
+	% Slice the 4xNumWords array into 4x4 round keys
+	RoundKeys = reshape(Words, 4, 4, NumRounds);
 end
 
-function K_out = SubWord(K_in)
+function K_out = SubWord(K_in) %#codegen
 	% AES Substitute Word transformation
 	% Input:  4x1 Key State Column
 	% Output: 4x4 Substituted State Column

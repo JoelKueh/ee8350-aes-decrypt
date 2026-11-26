@@ -1,13 +1,16 @@
-function P = Decrypt(C, RoundKeys)
+function P = Decrypt(C, RoundKeys, NumRounds) %#codegen
 	% AES Decryption Algorithm
 	% Input:  4x4 ciphertext matrix (C) and list of 4x4 round key matrcies
 	% Output: 4x4 decrypted plaintext (P)
 
+	coder.inline('never');
+	assert(NumRounds == 10 || NumRounds == 12 || NumRounds == 14);
+
     % Initial AddRoundKey using K10
-    S = AddRoundKey(C, RoundKeys(:,:,11));
+    S = AddRoundKey(C, RoundKeys(:,:,NumRounds+1));
 
     % Main decryption rounds: K9 down to K1
-    for r = 10:-1:2
+    for r = NumRounds:-1:2
         S = InvShiftRows(S);
         S = InvSubBytes(S);
         S = AddRoundKey(S, RoundKeys(:,:,r));
@@ -22,7 +25,7 @@ function P = Decrypt(C, RoundKeys)
     P = S;
 end
 
-function S_out = InvSubBytes(S_in)
+function S_out = InvSubBytes(S_in) %#codegen
     % AES SubBytes transformation
     % Input:  4x4 uint8 state matrix
     % Output: 4x4 uint8 substituted state matrix
@@ -35,7 +38,7 @@ function S_out = InvSubBytes(S_in)
     end
 end
 
-function S_out = InvMixColumns(S_in)
+function S_out = InvMixColumns(S_in) %#codegen
 	% AES MixColumns transofrmation
 	% Input:  4x4 state matrix
 	% Output: 4x4 transformed state matrix
@@ -63,7 +66,7 @@ function S_out = InvMixColumns(S_in)
     end
 end
 
-function S_out = InvShiftRows(S_in)
+function S_out = InvShiftRows(S_in) %#codegen
 	% AES ShiftRows transformation
 	% Input:  4x4 state matrix
 	% Output: 4x4 shifted state matrix
