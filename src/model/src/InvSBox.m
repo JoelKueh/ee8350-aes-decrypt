@@ -1,0 +1,42 @@
+function output = InvSBox(input)
+	% AES Inverse S-box transformation
+	% Input:  8-bit byte
+	% Output: 8-bit substituted byte
+
+	% Affine transformation matrix
+	A = uint8([
+		0 0 1 0 0 1 0 1;
+		1 0 0 1 0 0 1 0;
+		0 1 0 0 1 0 0 1;
+		1 0 1 0 0 1 0 0;
+		0 1 0 1 0 0 1 0;
+		0 0 1 0 1 0 0 1;
+		1 0 0 1 0 1 0 0;
+		0 1 0 0 1 0 1 0
+	]);
+
+	% Constant vector
+	C = uint8([1; 0; 1; 0; 0; 0; 0; 0]);
+
+	% Convert the input into a bit vector
+	bits = zeros(8, 1, 'uint8');
+	for k = 1:8
+		bits(k) = bitget(input, k);
+	end
+
+	% Affine transformation over GF(2)
+	mapped = zeros(8, 1, 'uint8');
+	for k = 1:8
+		mapped(k) = mod(sum(A(k,:)'.*bits), 2);
+	end
+	mapped = bitxor(mapped, C);
+
+	% Pack the bit vector back into an 8-bit integer
+	packed = uint8(0);
+	for k = 1:8
+		packed = bitor(packed, bitshift(mapped(k), k-1));
+	end
+
+	% Compute the inverse of the byte in the Galois field.
+	output = GfInv(packed);
+end
