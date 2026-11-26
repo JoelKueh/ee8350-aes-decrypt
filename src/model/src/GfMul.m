@@ -1,4 +1,4 @@
-function output = GfMul(a, b)
+function output = GfMul(a, b) %#codegen
 	% 8-bit Multiplication in the Galois field
 	% Input:  8-bit byte
 	% Output: 8-bit byte

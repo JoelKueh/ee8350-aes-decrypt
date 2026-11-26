@@ -1,4 +1,4 @@
-function output = SBox(input)
+function output = SBox(input) %#codegen
 	% AES S-box transformation
 	% Input:  8-bit byte
 	% Output: 8-bit substituted byte

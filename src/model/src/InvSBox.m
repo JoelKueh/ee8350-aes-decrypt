@@ -1,4 +1,4 @@
-function output = InvSBox(input)
+function output = InvSBox(input) %#codegen
 	% AES Inverse S-box transformation
 	% Input:  8-bit byte
 	% Output: 8-bit substituted byte

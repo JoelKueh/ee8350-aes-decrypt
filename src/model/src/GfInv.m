@@ -1,4 +1,4 @@
-function output = GfInv(input)
+function output = GfInv(input) %#codegen
 	% Multiplicative 8-bit inverse in the Galois field
 	% Input:  8-bit byte
 	% Output: 8-bit byte
