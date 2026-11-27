@@ -7,8 +7,8 @@ function RoundKeys = KeyExpand(K, NumRounds) %#codegen
 	assert(NumRounds == 10 || NumRounds == 12 || NumRounds == 14);
 
 	% Compute the number of columns from the number of rounds
-	NumCols = NumRounds - 7;
-	NumWords = 4 * NumRounds;
+	NumCols = NumRounds - 6;
+	NumWords = 4 * (NumRounds + 1);
 
 	% Create initial array of words
 	Words = zeros(4, NumWords, 'uint8');
@@ -38,13 +38,13 @@ function RoundKeys = KeyExpand(K, NumRounds) %#codegen
 	end
 
 	% Slice the 4xNumWords array into 4x4 round keys
-	RoundKeys = reshape(Words, 4, 4, NumRounds);
+	RoundKeys = reshape(Words, 4, 4, NumRounds + 1);
 end
 
 function K_out = SubWord(K_in) %#codegen
 	% AES Substitute Word transformation
 	% Input:  4x1 Key State Column
-	% Output: 4x4 Substituted State Column
+	% Output: 4x1 Substituted State Column
 
 	% SubWord uses SBox like Encryption but only on column 1
     K_out = zeros(4,1,'uint8');

@@ -1,8 +1,9 @@
-%% Generate HECTOR-ready C++ for KeyExpand, Encrypt, and Decrypt
+%% Generate HECTOR-friendly C++ for KeyExpand, Encrypt, and Decrypt
 clear; clc;
 
 addpath('src');
 
+% Configure coder to use HECTOR-friendly techniques
 cfg = coder.config('lib');
 cfg.TargetLang                    = 'C++';
 cfg.GenCodeOnly                   = true;
@@ -10,17 +11,22 @@ cfg.EnableDynamicMemoryAllocation = false;
 cfg.SupportNonFinite              = false;
 cfg.GenerateExampleMain           = 'DoNotGenerate';
 cfg.GenerateReport                = true;
-cfg.FilePartitionMethod           = 'MapMFileToCFile'; % Emits KeyExpand.cpp, Encrypt.cpp, Decrypt.cpp
+cfg.FilePartitionMethod           = 'MapMFileToCFile';
 
-% Fixed-size input specifications
-t_block      = coder.typeof(uint8(0), [4, 4]);
-t_key        = coder.typeof(uint8(0), [4, 8]);
-t_round_keys = coder.typeof(uint8(0), [4, 4, 15]);
-t_u8         = coder.typeof(uint8(0)); % Used for NumCols (4/6/8) and Nr (10/12/14)
+% AES-128 (4x4 key, 11 round keys, 10 rounds)
+codegen -config cfg -d codegen/lib/aes_128 -o aes_128 ...
+	KeyExpand -args {coder.typeof(uint8(0), [4 4]), coder.Constant(uint8(10))} ...
+	Encrypt   -args {coder.typeof(uint8(0), [4 4]), coder.typeof(uint8(0), [4 4 11]), coder.Constant(uint8(10))} ...
+	Decrypt   -args {coder.typeof(uint8(0), [4 4]), coder.typeof(uint8(0), [4 4 11]), coder.Constant(uint8(10))}
 
-% Generate all three entry points into ./codegen/lib/aes_model/
-codegen -config cfg -d codegen/lib/aes_model ...
-    KeyExpand -args {t_key, t_u8} ...
-    Encrypt   -args {t_block, t_round_keys, t_u8} ...
-    Decrypt   -args {t_block, t_round_keys, t_u8}
+% AES-192 (4x6 key, 13 round keys, 12 rounds)
+codegen -config cfg -d codegen/lib/aes_192 -o aes_192 ...
+	KeyExpand -args {coder.typeof(uint8(0), [4 6]), coder.Constant(uint8(12))} ...
+	Encrypt   -args {coder.typeof(uint8(0), [4 4]), coder.typeof(uint8(0), [4 4 13]), coder.Constant(uint8(12))} ...
+	Decrypt   -args {coder.typeof(uint8(0), [4 4]), coder.typeof(uint8(0), [4 4 13]), coder.Constant(uint8(12))}
 
+% AES-256 (4x8 key, 15 round keys, 14 rounds)
+codegen -config cfg -d codegen/lib/aes_256 -o aes_256 ...
+	KeyExpand -args {coder.typeof(uint8(0), [4 8]), coder.Constant(uint8(14))} ...
+	Encrypt   -args {coder.typeof(uint8(0), [4 4]), coder.typeof(uint8(0), [4 4 15]), coder.Constant(uint8(14))} ...
+	Decrypt   -args {coder.typeof(uint8(0), [4 4]), coder.typeof(uint8(0), [4 4 15]), coder.Constant(uint8(14))}

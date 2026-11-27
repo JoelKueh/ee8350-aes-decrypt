@@ -60,10 +60,10 @@ vcf:
 # ----- Codegen ---------------------------------------------------------------
 
 gen-formal:
-	cd src/model && cd "$$(pwd -P)" && matlab -batch "gen_formal"
+	cd src/model && cd "$$(pwd -P)" && QT_QPA_PLATFORM=offscreen matlab -batch "gen_formal"
 
 gen-dpi:
-	cd src/model && cd "$$(pwd -P)" && matlab -batch "gen_dpi"
+	cd src/model && cd "$$(pwd -P)" && QT_QPA_PLATFORM=offscreen matlab -batch "gen_dpi"
 
 # ----- Cleanup ---------------------------------------------------------------
 
