@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REMOTE="vlsi"
+REMOTE="vs"
 REMOTE_DIR="/home/kuehn348/src/ee8350/aes-decode-remote"
 
 # Parse arguments
@@ -23,7 +23,7 @@ rsync -av --delete \
 
 # Run the command on the remote directory
 set +e
-ssh "${REMOTE}" "bash -lc 'cd ${REMOTE_DIR} && ${CMD}'"
+ssh "${REMOTE}" "zsh -lc 'cd ${REMOTE_DIR} && ${CMD}'"
 STATUS=$?
 set -e
 

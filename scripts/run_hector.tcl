@@ -46,7 +46,7 @@ proc cyc {n} { expr {2 * $n - 1} }
 
 proc compile_spec {} {
 	create_design -name spec -top hector_wrapper
-	cppan -I$::SPC_DIR -DAES_KEY_BYTES=$::KEY_BYTES -DAES_RK_BYTES=$::KEY_BUFFER_BYTES \
+	cppan -m64 -I$::SPC_DIR -DAES_KEY_BYTES=$::KEY_BYTES -DAES_RK_BYTES=$::KEY_BUFFER_BYTES \
 		   {*}$::SPC_SRCS {*}$::DPV_SRCS
 	compile_design spec
 }
@@ -83,7 +83,7 @@ proc ual {} {
 	lemma pt_eq = (spec.P(1) == impl.pt([cyc $::PT_CYCLE]))
 }
 
-set_user_assume_lemmas_procedures "ual"
+set_user_assumes_lemmas_procedure "ual"
 
 compile_spec
 compile_impl

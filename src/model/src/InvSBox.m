@@ -3,6 +3,31 @@ function output = InvSBox(input) %#codegen
 	% Input:  8-bit byte
 	% Output: 8-bit substituted byte
 
+	% If this is MATLAB Coder, then compile to LUT
+	if coder.target('MATLAB')
+		output = inv_sbox_matlab(input);
+	else
+		lut = coder.const(build_inv_sbox_lut());
+		output = lut(uint16(input) + uint16(1));
+	end
+end
+
+function output = inv_sbox_matlab(input)
+	persistent INV_SBOX_LUT
+	if isempty(INV_SBOX_LUT)
+		INV_SBOX_LUT = build_inv_sbox_lut();
+	end
+	output = INV_SBOX_LUT(uint16(input) + uint16(1));
+end
+
+function lut = build_inv_sbox_lut()
+	lut = zeros(1, 256, 'uint8');
+	for v = 0:255
+		lut(v + 1) = inv_sbox_math(uint8(v));
+	end
+end
+
+function output = inv_sbox_math(input)
 	% Affine transformation matrix
 	A = uint8([
 		0 0 1 0 0 1 0 1;

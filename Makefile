@@ -2,6 +2,9 @@
 # ee8350 — build system
 # =============================================================================
 
+SHELL       := /bin/zsh
+.SHELLFLAGS := -o pipefail -c
+
 # Basic Configuration
 TOP_MODULE ?= aes_tb
 UVM_TEST   ?= aes_base_test
@@ -20,7 +23,7 @@ AES_MODE   ?= 128
 export AES_MODE
 
 # Source Directory Configuration
-SPC_DIR := $(realpath src/model/codegen/lib/aes_$(AES_MODE))
+SPC_DIR := $(realpath src/model/codegen/lib/aes_$(AES_MODE)/standalone)
 DPV_DIR := $(realpath src/dpv)
 FPV_DIR := $(realpath src/fpv)
 HDL_DIR := $(realpath src/hdl)
@@ -94,11 +97,9 @@ sim-vl: build-vl
 
 dpv:
 	@mkdir -p $(BUILD_DIR)/vcf
-	SPC_DIR="$(SPC_DIR)" \
-	SPC_SRCS="$(SPC_SRCS)" \
-	DPV_SRCS="$(DPV_SRCS)" \
-	HDL_SRCS="$(HDL_SRCS)" \
-	$(VCF) -fmode DPV -batch -f $(VCF_TCL) | tee $(BUILD_DIR)/vcf/vcf.log
+	cd "$(BUILD_DIR)/vcf" && \
+	SPC_DIR="$(SPC_DIR)" SPC_SRCS="$(SPC_SRCS)" DPV_SRCS="$(DPV_SRCS)" HDL_SRCS="$(HDL_SRCS)" \
+	$(VCF) -fmode DPV -batch -output_log_file vcf.log -f $(realpath $(VCF_TCL))
 
 # ----- Codegen ---------------------------------------------------------------
 
