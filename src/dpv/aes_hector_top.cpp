@@ -1,13 +1,12 @@
+
 #include "Hector.h"
 #include "KeyExpand.h"
-#include "Encrypt.h"
 #include "Decrypt.h"
-#include <stdint>
 
-// Override these from compile time definitions to test other modules
 #ifndef AES_KEY_BYTES
 #define AES_KEY_BYTES 16
 #endif
+
 #ifndef AES_RK_BYTES
 #define AES_RK_BYTES 176
 #endif
