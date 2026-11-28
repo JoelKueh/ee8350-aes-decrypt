@@ -51,7 +51,7 @@ interface rv_if#(
     task automatic wait_handshake();
         forever begin
             @(mon_cb);
-            if (mon_cb.rkey_vld_decode === 1)
+            if (mon_cb.valid === 1)
                 break;
         end
     endtask

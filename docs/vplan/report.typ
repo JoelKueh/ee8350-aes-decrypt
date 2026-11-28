@@ -42,7 +42,7 @@
   #v(2.0in) // Pushes title block down comfortably on the page
 
   #align(center)[
-    #text(20pt)[*EE8350 - AES Decode*] \
+    #text(20pt)[*EE8350 - AES Decrypt*] \
     *Joel Kuehne \<kuehn348\@umn.edu\>*
   ]
 
@@ -183,7 +183,7 @@ is below.
     [*2*], table.cell(colspan:2)[*Reset*],
     table.cell(rowspan:4)[2.1], [Synchronous Warm Reset],
     [Verify that DUT state transitions to 0 on reset and any stored key or ciphertext is dropped.],
-    table.cell(colspan:2)[Assert that the expander and decoder modules return to state 0 after
+    table.cell(colspan:2)[Assert that the expander and decrypt modules return to state 0 after
     reset.],
     table.cell(colspan:2)[Verify that transactions before and after reset are processed
     successfully.],
@@ -255,7 +255,7 @@ verification is done in the testbench framework in @tb below.
 PT Agent, CT Agent, and KT Agent are parameterizations of a simple ready/valid interface
 agent. Agents drive and observe handshakes on their respective interfaces and publish events to
 their respective scoreboards. Each agent attaches to an interface which provides driving and
-monitoring tasks and defines pin-level assertions. The decode and expand scoreboards hook into a software
+monitoring tasks and defines pin-level assertions. The decrypt and expand scoreboards hook into a software
 decryption model that is used as a reference for the verification.
 
 == Formal Methods

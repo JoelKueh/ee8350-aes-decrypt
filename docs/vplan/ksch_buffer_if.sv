@@ -52,17 +52,17 @@ interface ksch_buffer_if#(
         key = tb_cb.rkey_keyexp;
     endtask
 
-    task automatic rkey_decode_wait_handshake();
+    task automatic rkey_decrypt_wait_handshake();
         forever begin
             @(tb_cb);
-            if (tb_cb.rkey_vld_decode === 1)
+            if (tb_cb.rkey_vld_decrypt === 1)
                 break;
         end
     endtask
 
-    task automatic rkey_decode_get_key(inout logic [127:0] key);
-        rkey_decode_wait_handshake();
-        key = tb_cb.rkey_decode;
+    task automatic rkey_decrypt_get_key(inout logic [127:0] key);
+        rkey_decrypt_wait_handshake();
+        key = tb_cb.rkey_decrypt;
     endtask
 
     // Asynchronous ksch buffer data predictor
@@ -81,7 +81,7 @@ interface ksch_buffer_if#(
             end
 
             // Read pointer advance
-            if (rkey_vld_decode) begin
+            if (rkey_vld_decrypt) begin
                 expected_rd_ptr <= expected_rd_ptr == 0 ? KSCH_BUFFER_DEPTH - 1 : expected_rd_ptr - 1;
             end
         end
@@ -96,7 +96,7 @@ interface ksch_buffer_if#(
     else $error("Data ordering missmatch!");
     c_p_ksch_buffer_lifo: cover property (p_ksch_buffer_lifo);
 
-    // X-Propagation check for the decode side of the buffer
+    // X-Propagation check for the decrypt side of the buffer
     property p_ksch_buffer_decrypt_x_prop;
         @(posedge clk) disable iff (rst)
         rkey_vld_decrypt |-> !$isunknown(rkey_decrypt);
