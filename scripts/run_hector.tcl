@@ -52,20 +52,15 @@ proc compile_spec {} {
 }
 
 proc compile_impl {} {
-	create_design -name impl -top $::AES_TOP -clock clk -reset rst -posReset
-	vcs -sverilog {*}$::HDL_SRCS
+	create_design -name impl -top $::AES_TOP -clock clk
+	vcs -sverilog -timescale=1ns/10ps {*}$::HDL_SRCS
 	compile_design impl
 }
 
 proc ual {} {
-	# Synchronous reset, high on cycle 0 and low on all other cycles.
-	assume impl.rst([cyc 1]) == 1
-	for {set c 2} {$c <= $::PT_CYCLE} {incr c} {
-		assume impl.rst([cyc $c]) == 0
-	}
-
 	# Drive kt_vld and ct_vld for 1 cycle, low everywhere else
 	for {set c 1} {$c <= $::PT_CYCLE} {incr c} {
+		assume impl.rst([cyc $c])    == [expr {$c == 1 ? 1 : 0}]
 		assume impl.kt_vld([cyc $c]) == [expr {$c == $::KT_CYCLE ? 1 : 0}];
 		assume impl.ct_vld([cyc $c]) == [expr {$c == $::CT_CYCLE ? 1 : 0}];
 	}
@@ -92,5 +87,9 @@ compose
 solveNB p1
 proofwait
 
-listproof > "$OUT_DIR/proof_decrypt${AES_MODE}.txt"
+redirect -tee -file "proof_decrypt${AES_MODE}.txt" { listproof }
+simcex kt_accepted -vcd "cex_decrypt${AES_MODE}_kt_accepted.vcd"
+simcex ct_accepted -vcd "cex_decrypt${AES_MODE}_ct_accepted.vcd"
+simcex pt_valid    -vcd "cex_decrypt${AES_MODE}_pt_valid.vcd"
+simcex pt_eq       -vcd "cex_decrypt${AES_MODE}_pt_eq.vcd"
 exit

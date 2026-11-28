@@ -23,8 +23,8 @@ function RoundKeys = KeyExpand(K, NumRounds) %#codegen
 		temp = Words(:, i-1);
 
 		if mod(i-1, NumCols) == 0
-			% Perform special compuation on the first column in every key
-			temp = circshift(temp, -1);
+			% Perform special computation on the first column in every key
+			temp = temp([2; 3; 4; 1]);
 			temp = SubWord(temp);
 			temp(1) = bitxor(temp(1), rcon);
 			rcon = GfMul(rcon, uint8(2));

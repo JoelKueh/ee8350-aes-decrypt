@@ -30,13 +30,7 @@ HDL_DIR := $(realpath src/hdl)
 HVL_DIR := $(realpath src/hvl)
 
 # Source Filelist Configuration
-SPC_SRCS := $(SPC_DIR)/Encrypt.cpp \
-			$(SPC_DIR)/Decrypt.cpp \
-			$(SPC_DIR)/KeyExpand.cpp \
-			$(SPC_DIR)/SBox.cpp \
-			$(SPC_DIR)/aes_128_initialize.cpp \
-			$(SPC_DIR)/aes_128_terminate.cpp \
-			$(SPC_DIR)/circshift.cpp
+SPC_SRCS := $(wildcard $(SPC_DIR)/*.cpp)
 DPV_SRCS := $(DPV_DIR)/aes_hector_top.cpp
 FPV_SRCS :=
 HDL_SRCS := $(HDL_DIR)/generic/generic_muxfx.v \

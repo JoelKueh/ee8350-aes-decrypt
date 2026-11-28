@@ -42,7 +42,13 @@ for s = 1:numel(suites)
     PT = hex_to_states(pt_hex);
     CT = hex_to_states(ct_hex);
 
-    key_bits = size(K, 2) * 32;  % 128, 192, or 256
+    num_cols   = size(K, 2);                  % 4 (AES-128), 6 (AES-192), or 8 (AES-256)
+    key_bits   = num_cols * 32;               % 128, 192, or 256
+    num_rounds = uint8(num_cols + 6);         % uint8(10), uint8(12), or uint8(14)
+
+    assert(ismember(num_cols, [4, 6, 8]), ...
+        '%s: unsupported key width (%d columns)', name, num_cols);
+
     N = max([size(K, 3), size(PT, 3), size(CT, 3)]);
 
     for i = 1:N
@@ -50,9 +56,9 @@ for s = 1:numel(suites)
         pt_i  = PT(:, :, min(i, size(PT, 3)));
         ct_i  = CT(:, :, min(i, size(CT, 3)));
 
-        RK    = KeyExpand(key_i);
-        P_out = Decrypt(ct_i, RK);
-        C_out = Encrypt(pt_i, RK);
+        RK    = KeyExpand(key_i, num_rounds);
+        P_out = Decrypt(ct_i, RK, num_rounds);
+        C_out = Encrypt(pt_i, RK, num_rounds);
 
         assert(isequal(P_out, pt_i), '%s (AES-%d) vector %d: Decrypt mismatch', name, key_bits, i);
         assert(isequal(C_out, ct_i), '%s (AES-%d) vector %d: Encrypt mismatch', name, key_bits, i);

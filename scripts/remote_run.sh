@@ -11,8 +11,14 @@ if [ $# -eq 0 ]; then
 fi
 printf -v CMD '%q ' "$@"
 
+# Use a single-line overall progress bar without per-file listing (rsync >= 3.1.0)
+RSYNC_FLAGS=(-a)
+if rsync --info=help >/dev/null 2>&1; then
+    RSYNC_FLAGS+=(--info=progress2)
+fi
+
 # Push repo (skip .git, build, and MATLAB report files)
-rsync -av --delete \
+rsync "${RSYNC_FLAGS[@]}" --delete \
   --exclude='.git/' \
   --exclude='build/' \
   --exclude='html/' \
@@ -29,7 +35,7 @@ set -e
 
 # Pull logs back and skip heavy cache directories
 mkdir -p build
-rsync -av \
+rsync "${RSYNC_FLAGS[@]}" \
   --exclude='csrc/' \
   --exclude='work/' \
   --exclude='simv.daidir/' \

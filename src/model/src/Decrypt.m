@@ -71,8 +71,8 @@ function S_out = InvShiftRows(S_in) %#codegen
 	% Input:  4x4 state matrix
 	% Output: 4x4 shifted state matrix
 
-	S_out = zeros(4, 4, 'uint8');
-	for i = 1:4
-		S_out(i,:) = circshift(S_in(i,:), +(i-1));
-	end
+	S_out = S_in;
+	S_out(2, :) = S_in(2, [4 1 2 3]);
+	S_out(3, :) = S_in(3, [3 4 1 2]);
+	S_out(4, :) = S_in(4, [2 3 4 1]);
 end
